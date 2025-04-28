@@ -2,14 +2,17 @@ package recaptcha_v3
 
 import (
 	"errors"
+	"github.com/clickthebus/sdk-go/request"
 	"time"
 )
 
-func Solve(params Params) (*Solution, error) {
+func Solve(params Params) (*Solution, *request.FailureResponse, error) {
 	// create a new job
-	job, err := CreateJob(params)
+	job, failResp, err := CreateJob(params)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	} else if failResp != nil {
+		return nil, failResp, nil
 	}
 
 	// wait for a solution
@@ -17,9 +20,11 @@ func Solve(params Params) (*Solution, error) {
 
 	var solution *Solution
 	for solution == nil {
-		jobStatus, err := GetJobStatus(job.Id)
+		jobStatus, failResp, err := GetJobStatus(job.Id)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
+		} else if failResp != nil {
+			return nil, failResp, nil
 		}
 
 		if jobStatus.Status == 3 && jobStatus.Solution != nil {
@@ -27,11 +32,11 @@ func Solve(params Params) (*Solution, error) {
 			solution = jobStatus.Solution
 		} else if jobStatus.Status == 4 {
 			// failure
-			return nil, errors.New("failed to complete job")
+			return nil, nil, errors.New("failed to complete job")
 		}
 
 		time.Sleep(1 * time.Second)
 	}
 
-	return solution, nil
+	return solution, nil, nil
 }

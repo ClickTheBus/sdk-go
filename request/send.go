@@ -2,7 +2,7 @@ package request
 
 import (
 	"errors"
-	clickthebus "github.com/clickthebus/sdk-go"
+	"github.com/clickthebus/sdk-go"
 	"io"
 	"net/http"
 	"strings"
