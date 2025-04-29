@@ -20,7 +20,7 @@ func Send(method string, path string, body *[]byte) (int, []byte, error) {
 		requestBody = strings.NewReader(string(*body))
 	}
 
-	req, err := http.NewRequest(method, "https://clickthebus.com/api"+path, requestBody)
+	req, err := http.NewRequest(method, "https://api.clickthebus.com/api"+path, requestBody)
 	if err != nil {
 		return 0, nil, err
 	}
